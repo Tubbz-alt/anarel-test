@@ -1,0 +1,12 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+
+import sys
+import ctypes
+
+assert len(sys.argv)>1, "must provide one or more shared object libraries to load"
+for lib in sys.argv[1:]:
+    res = ctypes.cdll.LoadLibrary(lib)
+    print("successfully loaded: %s res=%r" % (lib, res))
+sys.exit(0)

@@ -1,0 +1,306 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+
+import sys
+import os
+import argparse
+import importlib
+import subprocess as sb
+import yaml
+import json
+import platform
+
+from GetImportBinLibs import getBins, getLibs, getImports
+
+os.environ['PYTHON_VERSION'] = '%d.%d' % (sys.version_info.major, sys.version_info.minor)
+
+############# python3 porting issues ##############
+# http://python3porting.com/differences.html
+try:
+    input = raw_input
+except NameError:
+    pass
+
+if sys.version_info < (3,):
+    def b(x):
+        return x
+else:
+    import codecs
+    def b(x):
+        return codecs.latin_1_encode(x)[0]
+############### python 3 porting #####################
+
+TESTDB = os.path.join(os.path.split(__file__)[0], "testdb.yaml")
+
+description='''
+driver to test a conda installation.
+'''
+
+epilog='''There are four tests to do:
+basic - this is the recommended option to give. It reads the testdb yaml file (defaults to %s)
+        and does all the python imports, runs the bins with -h, and loads the .so files, that are
+        listed. Before running this, if
+        you are testing an environment with new packages, do --dryrun  to see what the
+        new imports are, then add them to the testdb yaml file.
+pkgs - to do more than imports, give a command like --pkgs psana or --pkgs numpy,scipy. To
+       test all pkgs, to --pkgs all
+
+The update command first reads the testdb file, and queries you about all the new imports and bins
+that it finds.
+''' % TESTDB
+
+
+parser = argparse.ArgumentParser(description=description,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter,
+                                 epilog=epilog)
+
+parser.add_argument('--pkglist', type=str, help="comma separated list of packages to test, or all", default='hdf5,openmpi,mpi4py,h5py,psana-conda,numpy')
+parser.add_argument('--testdb', type=str, help="supply alternate yaml file for import/bin/lib tests. default=%s" % TESTDB, default=TESTDB)
+parser.add_argument('--dryrun', action='store_true', help="dry run, do not execute tests", default=False)
+parser.add_argument('--sep', action='store_true', help="separate python process for each import. Slower, but more robust. Default is False", default=False)
+parser.add_argument('--default', action='store_true', help="do default testing (bins, imports, libs and default pkglist", default=False)
+parser.add_argument('--interactive', action='store_true', help="interactive mode, stops after a test fails", default=False)
+parser.add_argument('--bins', action='store_true', help="test the bins", default=False)
+parser.add_argument('--libs', action='store_true', help="test the libs", default=False)
+parser.add_argument('--imports', action='store_true', help="test the imports", default=False)
+parser.add_argument('--pkgs', action='store_true', help='test packages', default=False)
+parser.add_argument('--verbose', action='store_true', help="verbose testing", default=False)
+
+#parser.add_argument('--psana', action='store_true', help="run psana tests", default=False)
+#parser.add_argument('--perf', action='store_true', help="do performance tests", default=False)
+#parser.add_argument('--batch', action='store_true', help="do tests that use batch", default=False)
+#parser.add_argument('--update', action='store_true', help="update the list of import and bins to test - interactive command", default=False)
+
+def externalCommandTest(hdr, cmd, verbose, dryrun, interactive):
+    if verbose or interactive or dryrun:
+        print("------ %s: %s -------" % (hdr, cmd))
+    if dryrun: return 'NOT-PRESENT'
+    print(cmd)
+    if verbose or interactive:
+        retcode = os.system(cmd)
+    else:
+        p = sb.Popen(cmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE, universal_newlines=True)
+        out, err = p.communicate()
+        retcode = p.returncode
+    retmsg = 'PASS'
+    if retcode != 0: retmsg = 'FAIL'
+    if interactive:
+        raw_input("hit enter")
+        
+    if retcode == 0:
+        return "PASS"
+    return "FAIL"
+
+def binTest(tst, verbose, dryrun, interactive):
+    cmd = '%s -h' % tst
+    return externalCommandTest("binTest", cmd, verbose, dryrun, interactive)
+
+def importTest(tst, verbose, dryrun, interactive, sep=False):
+    if sep:
+        cmd = 'python -c "import %s"' % tst
+        return externalCommandTest("importTest", cmd, verbose, dryrun, interactive)
+        
+    ret = 'NOT-PRESENT'
+    if verbose or interactive or dryrun:
+        print("----- import %s" % tst)
+    if dryrun:
+        return ret
+    try:
+        importlib.import_module(tst)
+    except Exception as exp:
+        print("FAIL import %s exception: %r" % (tst, exp))
+        ret = 'FAIL'
+    if interactive:
+        raw_input("hit enter")
+    return 'PASS'
+    
+
+def libTest(tst, verbose, dryrun, interactive):
+    basedir=os.path.split(__file__)[0]
+    loadlib = os.path.join(basedir, 'loadlib')
+    assert os.path.exists(loadlib), "lib testing program not found: %s" % loadlib
+    cmd = '%s %s' % (loadlib, tst)
+    return externalCommandTest("libTest", cmd, verbose, dryrun, interactive)
+
+def loadTests(testdb_fname, verbose):
+    assert os.path.exists(testdb_fname), "testdb file: %s not found" % testdb_fname
+    testdb = yaml.load(open(testdb_fname,'r'))
+    for nm in ['imports', 'bins', 'libs']:
+        assert nm in testdb, "testdb yaml file is improperly formed, %s is missing" % nm
+        nmDict = testdb[nm]
+        for fld in ['do','skip']:
+            assert fld in nmDict, "testdb yaml file is improperly formed, %s is missing from the %s section" % \
+                (fld, nm)
+    if verbose:
+        print("Loaded %s" % testdb_fname)
+    return testdb
+
+def partition_matches(gl, candlist):
+    assert len(gl.split('*'))==2, "gl=%s does not have exactly one *" % gl
+    before, after = gl.split('*')
+    if after:
+        after_match = [el for el in candlist if el.endswith(after)]
+    else:
+        after_match = [el for el in candlist]
+    if before:
+        matches = [el for el in after_match if el.startswith(before)]
+    else:
+        matches = [el for el in candlist]
+    filtered_candlist = [el for el in candlist if el not in matches]
+    return matches, filtered_candlist
+
+def remove_tests(globs, normal, tests):
+    normal = set(normal)
+    tests = [tst for tst in tests if tst not in normal]
+    for gl in globs:
+        matches, tests = partition_matches(gl, tests)
+    return tests
+
+def identify_tests_todo(testdict, candidate_tests):
+    skip_list = [el for el in testdict['skip'] if el]
+    skip_globs = [el for el in skip_list if el.find('*')>=0]
+    skip_normal = set([el for el in skip_list if el.find('*')<0])
+
+    candidate_tests = remove_tests(skip_globs, skip_normal, candidate_tests)
+    
+    do_globs = [el for el in testdict['do'] if el.find('*')>=0]
+    do_normal = set([el for el in testdict['do'] if el.find('*')<0])
+
+    candidate_set = set(candidate_tests)
+    todo = list(do_normal.intersection(candidate_set))
+    remaining = list(candidate_set.difference(do_normal))
+    for gl in do_globs:
+        matches, remaining = partition_matches(gl, remaining)
+        todo.extend(matches)
+    return todo, remaining
+    
+def basicTest(testdb, bins, imports, libs, verbose, interactive, doBins, doImports, doLibs, dryrun, sep):
+    all_success = True
+    for ttype, tlist in zip(['bins','imports','libs'],
+                            [bins, imports, libs]):
+
+        if ttype == 'bins' and (not doBins): continue
+        if ttype == 'imports' and (not doImports): continue
+        if ttype == 'libs' and (not doLibs): continue
+
+        tests_todo, remaining = identify_tests_todo(testdb[ttype], tlist)
+        if len(remaining)>0:
+            print("%s: %d items not in testdb" % (ttype, len(remaining)))
+            if verbose:
+                remaining.sort()
+                print("  %s" % '  \n'.join(remaining))
+        results = {'PASS':[], 'FAIL':[], 'NOT-PRESENT':[]}
+        for tst in tests_todo:
+            if ttype == 'bins':
+                results[binTest(tst, verbose, dryrun, interactive)].append(tst)
+            elif ttype == 'imports':
+                results[importTest(tst, verbose, dryrun, interactive, sep)].append(tst)
+            elif ttype == 'libs':
+                results[libTest(tst, verbose, dryrun, interactive)].append(tst)
+
+        summary = "%s:" % ttype
+        for ky,val in results.items():
+            summary += " %s-%d" % (ky, len(val))
+        print(summary)
+        assert len(results['FAIL'])==0, "besicTest: %s has failures: %s" % (ttype, '  \n'.join(results['FAIL']))
+
+#def batchTest(testdb, verbose):
+#    pass
+
+#def perfTest(testdb, verbose):
+#    pass
+
+def getAvailPkgs():
+    cmd = 'conda list --json'
+    p = sb.Popen(cmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE,  universal_newlines=True)
+    stdout, stderr = p.communicate()
+    assert p.returncode==0, "cmd: %s returncode !=0\n===stdout:\n%s\n===stderr:\n%s" % (cmd, stdout, stderr)
+    pkgstrs = json.loads(stdout)
+    # split channel
+    def splitChannel(pkgstr):
+        if pkgstr.find('::')>=0:
+            return pkgstr.split('::')[1]
+        return pkgstr
+    pkgstrs = [splitChannel(pkgstr) for pkgstr in pkgstrs]
+    pkgs = set()
+    for pkgstr in pkgstrs:
+        flds = pkgstr.split('-')
+        pkgname = flds[0]
+        for fld in flds[1:]:
+            if len(fld)==0 or fld[0].isdigit():
+                break
+            pkgname += '-%s' % fld
+        pkgs.add(pkgname)
+    return pkgs
+
+def pkgsTest(testdb, pkgs, verbose, dryrun, interactive):
+    if len(pkgs)==1 and pkgs[0]=='all':
+        pkgs = testdb['pkgs'].keys()
+    pkgs = list(pkgs)
+    pkgs.sort()
+    avail_pkgs = set(getAvailPkgs())
+    print(avail_pkgs)
+    for pkg in pkgs:
+        if not (pkg in avail_pkgs) and (pkg != 'conda'):
+            print("pkgTest: skipping %s" % pkg)
+            continue
+        print("Testing pkg=%s" % pkg)
+        results = {'PASS':[], 'FAIL':[], 'NOT-PRESENT':[]}
+        pkgTestDb = testdb['pkgs'][pkg]
+        commands = pkgTestDb['commands']
+        if 'skiphost' in pkgTestDb:
+            skiphost = pkgTestDb['skiphost']
+            node = platform.node()
+            if node == skiphost:
+                commands = []
+                print("pkg=%s skiphost=%s match - not testing" % (pkg, node))
+            else:
+                print("pkg=%s skiphost=%s not a match (node=%s) testing" % (pkg, skiphost, node))
+        for cmd in commands:
+            results[externalCommandTest('pkg=%s' % pkg, cmd, True, dryrun, interactive)].append(cmd)
+
+        summary = "%s:" % pkg
+        for ky,val in results.items():
+            summary += " %s-%d" % (ky, len(val))
+        print(summary)
+        assert len(results['FAIL'])==0, "pkgsTest: %s has failures: %s" % (pkg, '  \n'.join(results['FAIL']))
+
+if __name__ == '__main__':
+    args = parser.parse_args()
+    if args.default:
+        args.imports=True
+        args.pkgs=True
+        args.bins=True
+        args.libs=True
+    assert any([args.imports, args.pkgs, args.bins, args.libs]), "Must specify at least one of --default --bins --imports --libs --pkgs. give -h option for help"
+    if args.dryrun: args.verbose=True
+
+    testdb = loadTests(args.testdb, args.verbose)
+
+    if args.imports or args.bins or args.libs:
+        imports = getImports(args.verbose)
+        bins = getBins(args.verbose)
+        libs = getLibs(args.verbose)
+        basicTest(testdb=testdb,
+                  bins=bins,
+                  imports=imports,
+                  libs=libs,
+                  verbose=args.verbose,
+                  interactive=args.interactive,
+                  doBins=args.bins,
+                  doImports=args.imports,
+                  doLibs=args.libs,
+                  dryrun=args.dryrun,
+                  sep=args.sep)
+
+    if args.pkgs:
+        pkgsTest(testdb=testdb,
+                 pkgs=args.pkglist.split(','),
+                 verbose=args.verbose,
+                 dryrun=args.dryrun,
+                 interactive=args.interactive)
+
+    
+
+    

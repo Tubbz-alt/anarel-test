@@ -1,0 +1,925 @@
+bins:
+  do:
+  - LogBookGrabber_qt
+  - spyder  
+  - 2to3
+  - anaconda
+  - binstar
+  - bldreader
+  - codegen
+  - conda
+  - corana
+  - coverage
+  - cython
+  - ddl_psana
+  - detnames
+  - dmgreader
+  - easy_install
+  - ebeamreader
+  - event_keys
+  - generatePowder
+  - geo
+  - h5-mpi-translate
+  - h5ls
+  - h5repack
+  - h5stat
+  - icuinfo
+  - idle
+  - indexCrystals
+  - ipython
+  - jsonschema
+  - jupyter
+  - lconvert
+  - litPixels
+  - mpiexec
+  - mpirun
+  - nosetests
+  - ompi_info
+  - orte-info
+  - oshmem_info
+  - parCorAnaDriver
+  - pip
+  - psana
+  - psdisplay
+  - psplot
+  - ptdump
+  - pyPsanaMonit
+  - python
+  - qmake
+  - roicon
+  - scons
+  - sconsign
+  - shmemrun
+  - sip
+  - smldata
+  - virtualenv
+  - vtrun
+  - vtunify
+  - wheel
+  - xml2-config
+  - xtc2cxidb
+  - xtcEpicsReaderTest
+  - xtcanalyze
+  - xtccompress
+  - xtcindex
+  - xtclinedump
+  - xtcmodify
+  - xtcmonclient
+  - xtcmonclientexample
+  - xtcmonserver
+  - xtcmonwriter
+  - xtcreader
+   # TODO: get calibman and calibrun to pass, logBook
+  - calibrun
+  - med
+  - plims
+
+  skip:
+  # GUIs
+  - tcdpe
+  - tcmt
+
+  # won't run on rhel5
+  - xraylib
+
+  # gives error if you are on pslogin
+  - calibman
+
+
+      # doesn't take -h
+  - crystfel2psana    
+  - psana2crystfel
+
+  todo:
+  - psocake
+  
+
+  # this fails with: skimage/io/_plugins/qt_plugin.py", ... ImportError: cannot import name warn
+  # we may have the wrong version of qt for this tool (whatever it is)
+  - skivi
+
+  # only runs from release directory
+  - ddl_*
+
+  # error - unable to open perl script?
+  - elf2e32_qtwrapper
+
+  # import error testpath, some ipython testing
+  - iptest
+  - iptest2
+
+  # this test doesn't work in the rpm release, LusiPython is no longer around
+  - RegDBTestApp
+  
+imports:
+  do:
+  - LogBookClient
+  - alabaster
+  - babel
+  - babel.*
+  - docutils
+  - docutils.*
+  - imagesize
+  - jedi
+  - jedi.*
+  - pep8 
+  - pyflakes
+  - pyflakes.*
+  - spyderlib
+  - spyderlib.*
+  - spyderplugins
+  - spyderplugins.*
+  - rope
+  - rope.*
+  - sphinx
+  - sphinx.*
+  - snowballstemmer
+  - sphinx_rtd_theme
+  - BaseHTTPServer
+  - Bastion
+  - CGIHTTPServer
+  - ConfigParser
+  - Cookie
+  - DocXMLRPCServer
+  - HTMLParser
+  - MimeWriter
+  - Queue
+  - SimpleHTTPServer
+  - SimpleXMLRPCServer
+  - SocketServer
+  - StringIO
+  - UserDict
+  - UserList
+  - UserString
+  - __future__
+  - _abcoll
+  - _osx_support
+  - _pyio
+  - _strptime
+  - _sysconfigdata
+  - _threading_local
+  - _weakrefset
+  - abc
+  - aifc
+  - anydbm
+  - argparse
+  - ast
+  - asynchat
+  - asyncore
+  - atexit
+  - audiodev
+  - base64
+  - bdb
+  - binhex
+  - bisect
+  - cProfile
+  - calendar
+  - cgi
+  - cgitb
+  - chunk
+  - cmd
+  - code
+  - codecs
+  - codeop
+  - collections
+  - colorsys
+  - commands
+  - compileall
+  - compiler
+  - contextlib
+  - cookielib
+  - copy
+  - copy_reg
+  - csv
+  - ctypes
+  - ctypes.macholib
+  - curses
+  - decimal
+  - difflib
+  - dircache
+  - dis
+  - distutils
+  - distutils.command
+  - doctest
+  - dumbdbm
+  - dummy_thread
+  - dummy_threading
+  - email
+  - email.mime
+  - encodings
+  - filecmp
+  - fileinput
+  - fnmatch
+  - formatter
+  - fpformat
+  - fractions
+  - ftplib
+  - functools
+  - genericpath
+  - getopt
+  - getpass
+  - gettext
+  - glob
+  - gzip
+  - hashlib
+  - heapq
+  - hmac
+  - hotshot
+  - htmlentitydefs
+  - htmllib
+  - httplib
+  - idlelib
+  - idlelib.idle_test
+  - ihooks
+  - imaplib
+  - imghdr
+  - importlib
+  - imputil
+  - inspect
+  - io
+  - json
+  - keyword
+  - lib2to3
+  - lib2to3.fixes
+  - lib2to3.pgen2
+  - lib2to3.tests
+  - linecache
+  - locale
+  - logging
+  - macpath
+  - macurl2path
+  - mailbox
+  - mailcap
+  - markupbase
+  - md5
+  - mhlib
+  - mimetools
+  - mimetypes
+  - mimify
+  - modulefinder
+  - multifile
+  - multiprocessing
+  - multiprocessing.dummy
+  - mutex
+  - netrc
+  - new
+  - nntplib
+  - ntpath
+  - nturl2path
+  - numbers
+  - opcode
+  - optparse
+  - os
+  - os2emxpath
+  - pdb
+  - pickle
+  - pickletools
+  - pipes
+  - pkgutil
+  - platform
+  - plistlib
+  - popen2
+  - poplib
+  - posixfile
+  - posixpath
+  - pprint
+  - profile
+  - pstats
+  - pty
+  - py_compile
+  - pyclbr
+  - pydoc
+  - pydoc_data
+  - quopri
+  - random
+  - re
+  - repr
+  - rexec
+  - rfc822
+  - rlcompleter
+  - robotparser
+  - runpy
+  - sched
+  - sets
+  - sgmllib
+  - sha
+  - shelve
+  - shlex
+  - shutil
+  - site
+  - smtpd
+  - smtplib
+  - sndhdr
+  - socket
+  - sqlite3
+  - sre
+  - sre_compile
+  - sre_constants
+  - sre_parse
+  - ssl
+  - stat
+  - statvfs
+  - string
+  - stringold
+  - stringprep
+  - struct
+  - subprocess
+  - sunau
+  - sunaudio
+  - symbol
+  - symtable
+  - sysconfig
+  - tabnanny
+  - tarfile
+  - telnetlib
+  - tempfile
+  - textwrap
+  - this
+  - threading
+  - timeit
+  - toaiff
+  - token
+  - tokenize
+  - trace
+  - traceback
+  - tty
+  - types
+  - unittest
+  - urllib
+  - urllib2
+  - urlparse
+  - user
+  - uu
+  - uuid
+  - warnings
+  - wave
+  - weakref
+  - webbrowser
+  - whichdb
+  - wsgiref
+  - xdrlib
+  - xml
+  - xml.dom
+  - xml.etree
+  - xml.parsers
+  - xml.sax
+  - xmllib
+  - xmlrpclib
+  - zipfile
+  - CDROM
+  - DLFCN
+  - IN
+  - TYPES
+  - Canvas
+  - Dialog
+  - FileDialog
+  - FixTk
+  - ScrolledText
+  - SimpleDialog
+  - Tix
+  - Tkconstants
+  - Tkdnd
+  - Tkinter
+  - tkColorChooser
+  - tkCommonDialog
+  - tkFileDialog
+  - tkFont
+  - tkMessageBox
+  - tkSimpleDialog
+  - ttk
+  - turtle
+  - _bisect
+  - _codecs_cn
+  - _codecs_hk
+  - _codecs_iso2022
+  - _codecs_jp
+  - _codecs_kr
+  - _codecs_tw
+  - _collections
+  - _csv
+  - _ctypes
+  - _ctypes_test
+  - _curses
+  - _curses_panel
+  - _elementtree
+  - _functools
+  - _hashlib
+  - _heapq
+  - _hotshot
+  - _io
+  - _json
+  - _locale
+  - _lsprof
+  - _multibytecodec
+  - _multiprocessing
+  - _random
+  - _socket
+  - _sqlite3
+  - _ssl
+  - _struct
+  - _testcapi
+  - _tkinter
+  - array
+  - audioop
+  - binascii
+  - bz2
+  - cPickle
+  - cStringIO
+  - cmath
+  - crypt
+  - datetime
+  - fcntl
+  - future_builtins
+  - grp
+  - itertools
+  - linuxaudiodev
+  - math
+  - mmap
+  - nis
+  - operator
+  - ossaudiodev
+  - parser
+  - pyexpat
+  - readline
+  - resource
+  - select
+  - spwd
+  - strop
+  - syslog
+  - termios
+  - time
+  - unicodedata
+  - zlib
+  - backports
+  - backports.shutil_get_terminal_size
+  - backports.configparser
+  - backports.ssl_match_hostname
+  - decorator
+  - ipython_genutils*
+  - nose*
+  - path
+  - ptyprocess
+  - pygments*
+  - simplegeneric
+  - six
+  - wcwidth
+  - wcwidth.tests
+  - wheel*
+  - pathlib2
+  - pexpect
+  - pip*
+  - prompt_toolkit*
+  - traitlets*
+  - pickleshare
+  - IPython*
+  - mpi4py
+  - numpy*
+  - h5py*
+  - numexpr*
+  - scipy*
+  - tables*
+  - backports_abc
+  - coverage
+  - Cython*
+  - cython
+  - pyximport
+  - functools32
+  - markupsafe
+  - mistune
+  - MySQLdb
+  - _mysql
+  - _mysql_exceptions
+  - pyparsing
+  - pytz
+  - _yaml
+  - yaml
+  - zmq*
+  - requests
+  - requests.packages*
+  - simplejson
+  - simplejson.tests
+  - sip
+  - sipconfig
+  - sipdistutils
+  - clyent
+  - clyent.*
+  - configparser
+  - cycler
+  - jinja2
+  - jsonschema
+  - jsonschema.tests
+  - networkx
+  - networkx.*
+  - PIL
+  - PyQt4*
+  - dateutil*
+  - virtualenv
+  - virtualenv_support
+  - binstar_client*
+  - entrypoints
+  - jupyter
+  - jupyter_core
+  - jupyter_core.tests
+  - jupyter_core.utils
+  - pandas
+  - pandas.*
+  - pyqtgraph
+  - pyqtgraph.*
+  - sklearn
+  - sklearn.*
+  - tornado
+  - tornado.*
+  - _xraylib
+  - xrayhelp
+  - xraylib
+  - xraylib_np
+  - xraymessages
+  - jupyter_client
+  - jupyter_client.*
+  - nbformat
+  - nbformat.*
+  - cairo
+  - terminado
+  - terminado.tests
+  - ipykernel
+  - ipykernel.*
+  - matplotlib
+  - matplotlib.*
+  - mpl_toolkits
+  - mpl_toolkits.*
+  - pylab
+  - nbconvert
+  - nbconvert.*
+  - jupyter_console
+  - jupyter_console.tests
+  - notebook
+  - notebook.*
+  - qtconsole
+  - qtconsole.tests
+  - skimage
+  - skimage.*
+  - skbeam
+  - skbeam.*
+  - widgetsnbextension
+  - ipywidgets
+  - ipywidgets.*
+  - nb_anacondacloud
+  - nb_anacondacloud.tests
+  - nb_conda_kernels
+  - nb_conda_kernels.tests
+  - nb_conda
+  - nb_conda.tests
+  - nbpresent
+  - nbpresent.exporters
+  - nbpresent.tasks
+  - nbpresent.tests
+  - AppUtils
+  - CSPadPixCoords
+  - CalibManager
+  - ConfigSvc
+  - CorAna
+  - CythonUtils
+  - DbTools
+  - Detector
+  - ExpNameDb
+  - HDF5Explorer
+  - ImgAlgos
+  - LusiTime
+  - PSCalib
+  - ParCorAna
+  - PyCSPadImage
+  - RegDB
+  - SConsTools
+  - SConsTools.tools
+  - TimeTool
+  - Translator
+  - XtcExplorer
+  - XtcInput
+  - _ConfigSvc
+  - _TimeTool
+  - _psana
+  - anarelinfo
+  - detector_ext
+  - h5tools
+  - imgalgos_ext
+  - pdscalibdata
+  - psana
+  - psana_examples
+  - psana_test
+  - psddl
+  - psdisplay
+  - psmon
+  - psocake
+  - psparallel
+  - pyimgalgos
+  - pypsalg
+  - pypsalg_cpp
+  - xtcav
+  - OpenGL.GL.EXT
+  - OpenGL
+  - cffi
+  - psutil.tests  
+  - pbr  
+  - greenlet  
+  - pycparser  
+  - singledispatch_helpers  
+  - guppy.heapy  
+  - singledispatch  
+  - py._io  
+  - _pytest._code  
+  - pbr.hooks  
+  - funcsigs  
+  - guppy.doc  
+  - guppy.sets  
+  - py._log  
+  - py._path  
+  - pycparser.ply  
+  - py._process  
+  - guppy.gsl  
+  - mock.tests  
+  - _pytest.vendored_packages  
+  - _cffi_backend  
+  - pytest  
+  - _pytest.assertion  
+  - py._code  
+  - gevent  
+  - psutil  
+  - py  
+  - guppy  
+  - mkl  
+  - pbr.cmd  
+  - guppy.etc  
+  - _pytest  
+  - mock  
+  - MySQLdb.constants  
+  - guppy.heapy.test
+  - bokeh
+  - bokeh.*
+  - bottleneck
+  - bottleneck.*
+  - chest
+  - cloudpickle
+  - concurrent
+  - concurrent.*
+  - cv2
+  - dask
+  - dask.*
+  - external
+  - external.protobuf
+  - external.protobuf.*
+  - external.six_archive
+  - heapdict
+  - joblib
+  - joblib.*
+  - keras
+  - keras.*
+  - locket
+  - partd
+  - psgeom
+  - seaborn
+  - seaborn.*
+  - tensorflow
+  - tensorflow.*
+  - theano
+  - theano.*
+  - toolz
+  - toolz.*
+  - xarray
+  - xarray.*
+  - xray
+  - cyordereddict  
+  - cyordereddict.*
+  - h5netcdf
+  - enum  
+  - lmfit  
+  - lmfit.*
+
+  todo:
+  # TODO: maybe understand this failures?
+  - MySQLdb.constantsv
+
+  skip:
+  # don't worry about these:
+  - OpenGL.*
+  - antigravity
+  - this
+  - IPython.kernel
+  - skimage.filter
+  - matplotlib.delaunay
+  - pandas.rpy
+  - _LWPCookieJar
+  - _MozillaCookieJar
+  - __phello__.foo
+  - dbhash
+  - bsddb
+  - pbr.tests
+  - distutils.tests
+  - json.tests
+  - test_path
+  - zmq.backend.cffi
+  - pandas.rpy
+  - skimage.filter
+  - skimage.filter.rank
+  - theano.sparse
+  - theano.sparse.*
+  
+libs:
+  do:
+  - libAppUtils.so
+  - libCSPadPixCoords.so
+  - libConfigSvc.so
+  - libDetector.so
+  - libErrSvc.so
+  - libExpNameDb.so
+  - libFileIO.so
+  - libH5DataTypes.so
+  - libIData.so
+  - libImgAlgos.so
+  - libImgPixSpectra.so
+  - libLusiTime.so
+  - libMsgLogger.so
+  - libPSCalib.so
+  - libPSEnv.so
+  - libPSEvt.so
+  - libPSHdf5Input.so
+  - libPSHist.so
+  - libPSQt.so
+  - libPSShmemInput.so
+  - libPSTime.so
+  - libPSXtcInput.so
+  - libPSXtcMPInput.so
+  - libPSXtcOutput.so
+  - libQt*.so
+  - libRdbMySQL.so
+  - libTimeTool.so
+  - libTranslator.so
+  - libXtcInput.so
+  - libboost_*.so
+  - libcairo-script-interpreter.so
+  - libcairo.so
+  - libcompressdata.so
+  - libcrypto.so
+  - libcspad_mod.so
+  - libffi.so
+  - libfontconfig.so
+  - libfreetype.so
+  - libglut.so
+  - libhdf5.so
+  - libhdf5_cpp.so
+  - libhdf5_hl.so
+  - libhdf5_hl_cpp.so
+  - libhdf5pp.so
+  - libhistory.so
+  - libicudata.so
+  - libicui18n.so
+  - libicuio.so
+  - libicule.so
+  - libiculx.so
+  - libicutest.so
+  - libicutu.so
+  - libicuuc.so
+  - libindexdata.so
+  - libiomp5.so
+  - libjpeg.so
+  - liblzma.so
+  - libmca_common_sm.so
+  - libmca_common_verbs.so
+  - libmkl_*.so
+  - libmpi.so
+  - libmpi_cxx.so
+  - libmpi_mpifh.so
+  - libmpi_usempi.so
+  - libmysqlclient.so
+  - libmysqlclient_r.so
+  - libompitrace.so
+  - libopen-pal.so
+  - libopen-rte.so
+  - libopen-trace-format.so
+  - liboshmem.so
+  - libotfaux.so
+  - libpdscalibdata.so
+  - libpixman-1.so
+  - libpng.so
+  - libpng16.so
+  - libpsalg.so
+  - libpsana.so
+  - libpsana_examples.so
+  - libpsana_python.so
+  - libpsana_test.so
+  - libpsddl_hdf2psana.so
+  - libpsddl_pds2psana.so
+  - libpsddl_pdsdata.so
+  - libpsddl_psana.so
+  - libpsddl_python.so
+  - libpython2.7.so
+  - libpytools.so
+  - libreadline.so
+  - libsmalldata.so
+  - libsodium.so
+  - libsqlite3.so
+  - libssl.so
+  - libsz.so
+  - libtcl.so
+  - libtcl8.5.so
+  - libtiff.so
+  - libtiffxx.so
+  - libtk.so
+  - libtk8.5.so
+  - libvt-hyb.so
+  - libvt-mpi-unify.so
+  - libvt-mpi.so
+  - libvt-mt.so
+  - libvt.so
+  - libxml2.so
+  - libxrl.so
+  - libxtcdata.so
+  - libxtcrunset.so
+  - libyaml.so
+  - libz.so
+  - libzmq.so
+  - libgio-2.0.so  
+  - libglib-2.0.so  
+  - libgmodule-2.0.so  
+  - libgobject-2.0.so  
+  - libgthread-2.0.so  
+  - libharfbuzz.so  
+  - libjasper.so  
+  - libopencv_*.so  
+  - libpango*.so  
+  skip:
+  - libappdata.so
+  - libanadata.so
+  - libxtcrunset.so  
+  - libompitrace.so  
+  - libpsddl_pdsdata.so  
+  - libmca_common_verbs.so  
+  - libindexdata.so  
+  - libglut.so  
+  - libcompressdata.so  
+  - libmca_common_sm.so  
+  - libsmalldata.so  
+  - libmkl_*.so
+  - libreadline.so            # undefined symbol, PC?
+  todo:
+  - libanadata.so             # rpm and conda, with undefined symbol: _ZNK3Pds8Sequence7serviceEv
+  - libappdata.so             # rpm and conda, undefined symbol: shm_open
+  - libcompressdata.so        # rpm and conda, undefined symbol: _ZN3Pds6TypeIdC1ENS0_4TypeEjb
+  - libglut.so                # undefined symbol: XF86VidModeSetViewPort
+  - libindexdata.so           # rpm and conda: undefined symbol: _ZN3Pds7DetInfo4nameENS0_8DetectorE
+  - libmca_common_sm.so       # undefined symbol: opal_buffer_t_class
+  - libmca_common_verbs.so    # undefined symbol: orte_process_info
+  - libmkl_*.so,  # really, any of those in skip now, be good to understand why they fail
+
+pkgs:
+  psana-conda:
+     commands:
+      - "python $CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages/psana_test/psanaTestLib.py test"
+#      - "python $CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages/psana_test/liveModeSimLib.py"
+#      - "python $CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages/psana_test/unitTestsLiveMode.py"
+      - "python $CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages/psana_test/unitTestsPdsdata.py"
+      - "python $CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages/psana_test/unitTests.py"
+      - "python $CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages/TimeTool/unitTests.py"
+      - "python $CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages/ParCorAna/UserG2MPITest.py"
+      - "python $CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages/ParCorAna/unitTestsWorkerData.py"
+      - "python $CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages/ParCorAna/unitTestsParCorAna.py"
+      - "python $CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages/Translator/unitTests.py"
+# problem, this needs to import sys
+#      - "python $CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages/XtcInput/unitTestPyDgramListUtil.py"
+
+  openmpi:
+    commands:
+    - "python pkgs/openmpi/run_tests.py"
+
+  hdf5:
+    commands:
+    - "python pkgs/hdf5/run_tests.py"
+
+  mpi4py:
+    commands:
+    - "python pkgs/mpi4py/run_tests.py"
+
+  tables:
+    commands:
+    - "python -c \"import tables.test()\""
+
+  pandas:
+    commands:
+      - "python -c \"import pandas; pandas.test('fast')\""
+
+  h5py:
+    commands:
+    - "python pkgs/h5py/run_tests.py"
+    - "python -c \"import h5py.tests; h5py.tests.run_tests()\""
+
+  conda:
+    commands:
+    - "python pkgs/conda/run_tests.py"
+
+  numpy:
+     commands:
+      - "python -c \"import numpy; numpy.test('fast')\""
+
+  scipy:
+     commands:
+      - "python -c \"import scipy; scipy.test('fast')\""
+  
