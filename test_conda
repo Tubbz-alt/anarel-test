@@ -10,6 +10,7 @@ import subprocess as sb
 import yaml
 import json
 import platform
+import random
 
 from GetImportBinLibs import getBins, getLibs, getImports
 
@@ -60,17 +61,13 @@ parser.add_argument('--testdb', type=str, help="supply alternate yaml file for i
 parser.add_argument('--dryrun', action='store_true', help="dry run, do not execute tests", default=False)
 parser.add_argument('--sep', action='store_true', help="separate python process for each import. Slower, but more robust. Default is False", default=False)
 parser.add_argument('--default', action='store_true', help="do default testing (bins, imports, libs and default pkglist", default=False)
+parser.add_argument('--soft', action='store_true', help="soft test, only test imports/bins/libs/pkgs that are in environment. Default fail is test not present.")
 parser.add_argument('--interactive', action='store_true', help="interactive mode, stops after a test fails", default=False)
 parser.add_argument('--bins', action='store_true', help="test the bins", default=False)
 parser.add_argument('--libs', action='store_true', help="test the libs", default=False)
 parser.add_argument('--imports', action='store_true', help="test the imports", default=False)
 parser.add_argument('--pkgs', action='store_true', help='test packages', default=False)
 parser.add_argument('--verbose', action='store_true', help="verbose testing", default=False)
-
-#parser.add_argument('--psana', action='store_true', help="run psana tests", default=False)
-#parser.add_argument('--perf', action='store_true', help="do performance tests", default=False)
-#parser.add_argument('--batch', action='store_true', help="do tests that use batch", default=False)
-#parser.add_argument('--update', action='store_true', help="update the list of import and bins to test - interactive command", default=False)
 
 def externalCommandTest(hdr, cmd, verbose, dryrun, interactive):
     if verbose or interactive or dryrun:
@@ -157,25 +154,39 @@ def remove_tests(globs, normal, tests):
         matches, tests = partition_matches(gl, tests)
     return tests
 
-def identify_tests_todo(testdict, candidate_tests):
+def identify_tests_todo(ttype, testdict, candidate_tests):
+    # candidate_tests - what is available in the environment,
+    # first throw out tests we don't want to do, if they are in this environment
+    if ttype == 'lib': assert 'libxtcrunset.so' in candidate_tests, "fail 1"
     skip_list = [el for el in testdict['skip'] if el]
     skip_globs = [el for el in skip_list if el.find('*')>=0]
     skip_normal = set([el for el in skip_list if el.find('*')<0])
-
     candidate_tests = remove_tests(skip_globs, skip_normal, candidate_tests)
-    
-    do_globs = [el for el in testdict['do'] if el.find('*')>=0]
-    do_normal = set([el for el in testdict['do'] if el.find('*')<0])
+    if ttype == 'lib': assert 'libxtcrunset.so' in candidate_tests, "fail 2"
 
-    candidate_set = set(candidate_tests)
-    todo = list(do_normal.intersection(candidate_set))
-    remaining = list(candidate_set.difference(do_normal))
-    for gl in do_globs:
-        matches, remaining = partition_matches(gl, remaining)
-        todo.extend(matches)
-    return todo, remaining
+    # but together the tests that we want todo, keep track of tests we want to
+    # do that are not in the environment
+    tests_not_in_env = []
+    todo = []
+    for el in testdict['do']:
+        if el.find('*')<0:
+            if el in candidate_tests:
+                todo.append(el)
+                candidate_tests.remove(el)
+            else:
+                tests_not_in_env.append(el)
+        else:
+            glob_matches, candidate_tests = partition_matches(el, candidate_tests)
+            # candidate_tests is now filtered, glob matches removed
+            if len(glob_matches)==0:
+                tests_not_in_env.append(el)
+            else:
+                todo.extend(glob_matches)
+
+    tests_in_env_but_not_referenced_in_testdb = candidate_tests
+    return todo, tests_not_in_env, tests_in_env_but_not_referenced_in_testdb 
     
-def basicTest(testdb, bins, imports, libs, verbose, interactive, doBins, doImports, doLibs, dryrun, sep):
+def basicTest(testdb, bins, imports, libs, verbose, interactive, doBins, doImports, doLibs, dryrun, soft, sep):
     all_success = True
     for ttype, tlist in zip(['bins','imports','libs'],
                             [bins, imports, libs]):
@@ -184,13 +195,17 @@ def basicTest(testdb, bins, imports, libs, verbose, interactive, doBins, doImpor
         if ttype == 'imports' and (not doImports): continue
         if ttype == 'libs' and (not doLibs): continue
 
-        tests_todo, remaining = identify_tests_todo(testdb[ttype], tlist)
-        if len(remaining)>0:
-            print("%s: %d items not in testdb" % (ttype, len(remaining)))
+        tests_todo, tests_not_in_env, tests_not_in_db  = identify_tests_todo(ttype, testdb[ttype], tlist)
+        if not soft:
+            assert 0==len(tests_not_in_env), "ERROR: for test='%s' this environment is missing the following tests: %s" % (ttype, '\n  '.join(tests_not_in_env))
+            
+        if len(tests_not_in_db)>0:
+            print("%s: %d items not in testdb, use verbose flag to see them" % (ttype, len(tests_not_in_db)))
             if verbose:
-                remaining.sort()
-                print("  %s" % '  \n'.join(remaining))
+                tests_not_in_db.sort()
+                print("  %s" % '  \n'.join(tests_not_in_db))
         results = {'PASS':[], 'FAIL':[], 'NOT-PRESENT':[]}
+        print("%s: about to execute %d tests" % (ttype, len(tests_todo)))
         for tst in tests_todo:
             if ttype == 'bins':
                 results[binTest(tst, verbose, dryrun, interactive)].append(tst)
@@ -225,24 +240,27 @@ def getAvailPkgs():
     pkgstrs = [splitChannel(pkgstr) for pkgstr in pkgstrs]
     pkgs = set()
     for pkgstr in pkgstrs:
-        flds = pkgstr.split('-')
-        pkgname = flds[0]
-        for fld in flds[1:]:
-            if len(fld)==0 or fld[0].isdigit():
-                break
-            pkgname += '-%s' % fld
+        pkgname, pkgVer, buildStr = pkgstr.rsplit('-',2)
         pkgs.add(pkgname)
     return pkgs
 
-def pkgsTest(testdb, pkgs, verbose, dryrun, interactive):
+def pkgsTest(testdb, pkgs, verbose, dryrun, soft, interactive):
     if len(pkgs)==1 and pkgs[0]=='all':
         pkgs = testdb['pkgs'].keys()
+    else:
+        # an explicit list of packages is given, don't do soft
+        if soft:
+            print("pkgsTest: explicit list of packages has been given, turning off soft for pkgsTest")
+            soft = False
     pkgs = list(pkgs)
     pkgs.sort()
     avail_pkgs = set(getAvailPkgs())
-    print(avail_pkgs)
+    os.chdir(os.path.split(__file__)[0])  # testdb has commands like python pkgs/xx that only run relative to current directory
     for pkg in pkgs:
-        if not (pkg in avail_pkgs) and (pkg != 'conda'):
+        # below, conda will not show up in the environment package list, even though it is available
+        if (pkg != 'conda') and not (pkg in avail_pkgs):
+            if not soft:
+                assert pkg in avail_pkgs, "testPkgs: pkg=%s is not in avail_pkgs=%s" % (pkg, '\n  '.join(avail_pkgs))
             print("pkgTest: skipping %s" % pkg)
             continue
         print("Testing pkg=%s" % pkg)
@@ -292,6 +310,7 @@ if __name__ == '__main__':
                   doImports=args.imports,
                   doLibs=args.libs,
                   dryrun=args.dryrun,
+                  soft=args.soft,
                   sep=args.sep)
 
     if args.pkgs:
@@ -299,6 +318,7 @@ if __name__ == '__main__':
                  pkgs=args.pkglist.split(','),
                  verbose=args.verbose,
                  dryrun=args.dryrun,
+                 soft=args.soft,
                  interactive=args.interactive)
 
     

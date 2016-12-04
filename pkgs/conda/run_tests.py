@@ -40,8 +40,12 @@ def activate_new_env(name):
     return 0
 
 def clone_central_env(central_env, usr_env):
-    # this will fail is environment is not present, that's Ok.
+    # test clones an existing environment. First remove target if it exists.
+    # Removing target command will fail if it doesn't exist, so we don't check
+    # return code of next command
     run_command('conda env remove -n %s -y -q' % usr_env)
+
+    # now clone
     cmds = ['conda create -n %s -y -q --clone %s' % (usr_env, central_env),
             '''source activate %s && python -c "import yaml" && source deactivate''' % usr_env]
     for cmd in cmds:

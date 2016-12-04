@@ -57,7 +57,6 @@ bins:
   - vtunify
   - wheel
   - xml2-config
-  - xtc2cxidb
   - xtcEpicsReaderTest
   - xtcanalyze
   - xtccompress
@@ -78,6 +77,10 @@ bins:
   # GUIs
   - tcdpe
   - tcmt
+  # xtc2cxidb got its name changed, so we don't want to require
+  # testing it across releases
+  - xtc2cxidb
+  - xtc2cxi
 
   # won't run on rhel5
   - xraylib
@@ -125,16 +128,11 @@ imports:
   - pep8 
   - pyflakes
   - pyflakes.*
-  - spyderlib
-  - spyderlib.*
-  - spyderplugins
-  - spyderplugins.*
   - rope
   - rope.*
   - sphinx
   - sphinx.*
   - snowballstemmer
-  - sphinx_rtd_theme
   - BaseHTTPServer
   - Bastion
   - CGIHTTPServer
@@ -334,7 +332,6 @@ imports:
   - telnetlib
   - tempfile
   - textwrap
-  - this
   - threading
   - timeit
   - toaiff
@@ -578,7 +575,6 @@ imports:
   - CalibManager
   - ConfigSvc
   - CorAna
-  - CythonUtils
   - DbTools
   - Detector
   - ExpNameDb
@@ -610,12 +606,10 @@ imports:
   - psdisplay
   - psmon
   - psocake
-  - psparallel
   - pyimgalgos
   - pypsalg
   - pypsalg_cpp
   - xtcav
-  - OpenGL.GL.EXT
   - OpenGL
   - cffi
   - psutil.tests  
@@ -757,13 +751,11 @@ libs:
   - libboost_*.so
   - libcairo-script-interpreter.so
   - libcairo.so
-  - libcompressdata.so
   - libcrypto.so
   - libcspad_mod.so
   - libffi.so
   - libfontconfig.so
   - libfreetype.so
-  - libglut.so
   - libhdf5.so
   - libhdf5_cpp.so
   - libhdf5_hl.so
@@ -778,20 +770,15 @@ libs:
   - libicutest.so
   - libicutu.so
   - libicuuc.so
-  - libindexdata.so
   - libiomp5.so
   - libjpeg.so
   - liblzma.so
-  - libmca_common_sm.so
-  - libmca_common_verbs.so
-  - libmkl_*.so
   - libmpi.so
   - libmpi_cxx.so
   - libmpi_mpifh.so
   - libmpi_usempi.so
   - libmysqlclient.so
   - libmysqlclient_r.so
-  - libompitrace.so
   - libopen-pal.so
   - libopen-rte.so
   - libopen-trace-format.so
@@ -808,13 +795,10 @@ libs:
   - libpsana_test.so
   - libpsddl_hdf2psana.so
   - libpsddl_pds2psana.so
-  - libpsddl_pdsdata.so
   - libpsddl_psana.so
   - libpsddl_python.so
   - libpython2.7.so
   - libpytools.so
-  - libreadline.so
-  - libsmalldata.so
   - libsodium.so
   - libsqlite3.so
   - libssl.so
@@ -833,7 +817,6 @@ libs:
   - libxml2.so
   - libxrl.so
   - libxtcdata.so
-  - libxtcrunset.so
   - libyaml.so
   - libz.so
   - libzmq.so
@@ -900,16 +883,20 @@ pkgs:
 
   tables:
     commands:
-    - "python -c \"import tables.test()\""
+    - "python -c \"import tables; tables.test(verbose=10)\""
 
   pandas:
     commands:
-      - "python -c \"import pandas; pandas.test('fast')\""
+    - "python -c \"import pandas;\" "
+
+  # this is failing on psdev105 rhel6 where there is not a proper x11 connection.
+  # made a github issue: https://github.com/pandas-dev/pandas/issues/14793
+  #  - "python -c \"import pandas; pandas.test('fast', verbose=10)\""
 
   h5py:
     commands:
     - "python pkgs/h5py/run_tests.py"
-    - "python -c \"import h5py.tests; h5py.tests.run_tests()\""
+    - "python -c \"import h5py.tests; h5py.tests.run_tests(verbose=10)\""
 
   conda:
     commands:
@@ -917,9 +904,9 @@ pkgs:
 
   numpy:
      commands:
-      - "python -c \"import numpy; numpy.test('fast')\""
+      - "python -c \"import numpy; numpy.test('fast', verbose=10)\""
 
   scipy:
      commands:
-      - "python -c \"import scipy; scipy.test('fast')\""
+      - "python -c \"import scipy; scipy.test('fast', verbose=10)\""
   
