@@ -74,6 +74,7 @@ def externalCommandTest(hdr, cmd, verbose, dryrun, interactive):
         print("------ %s: %s -------" % (hdr, cmd))
     if dryrun: return 'NOT-PRESENT'
     print(cmd)
+    sys.stdout.flush()
     if verbose or interactive:
         retcode = os.system(cmd)
     else:
@@ -84,7 +85,6 @@ def externalCommandTest(hdr, cmd, verbose, dryrun, interactive):
     if retcode != 0: retmsg = 'FAIL'
     if interactive:
         raw_input("hit enter")
-        
     if retcode == 0:
         return "PASS"
     return "FAIL"
@@ -101,6 +101,7 @@ def importTest(tst, verbose, dryrun, interactive, sep=False):
     ret = 'NOT-PRESENT'
     if verbose or interactive or dryrun:
         print("----- import %s" % tst)
+        sys.stdout.flush()
     if dryrun:
         return ret
     try:
@@ -131,6 +132,7 @@ def loadTests(testdb_fname, verbose):
                 (fld, nm)
     if verbose:
         print("Loaded %s" % testdb_fname)
+        sys.stdout.flush()
     return testdb
 
 def partition_matches(gl, candlist):
@@ -204,8 +206,10 @@ def basicTest(testdb, bins, imports, libs, verbose, interactive, doBins, doImpor
             if verbose:
                 tests_not_in_db.sort()
                 print("  %s" % '  \n'.join(tests_not_in_db))
+                sys.stdout.flush()
         results = {'PASS':[], 'FAIL':[], 'NOT-PRESENT':[]}
         print("%s: about to execute %d tests" % (ttype, len(tests_todo)))
+        sys.stdout.flush()
         for tst in tests_todo:
             if ttype == 'bins':
                 results[binTest(tst, verbose, dryrun, interactive)].append(tst)
@@ -218,6 +222,7 @@ def basicTest(testdb, bins, imports, libs, verbose, interactive, doBins, doImpor
         for ky,val in results.items():
             summary += " %s-%d" % (ky, len(val))
         print(summary)
+        sys.stdout.flush()
         assert len(results['FAIL'])==0, "besicTest: %s has failures: %s" % (ttype, '  \n'.join(results['FAIL']))
 
 #def batchTest(testdb, verbose):
@@ -251,6 +256,7 @@ def pkgsTest(testdb, pkgs, verbose, dryrun, soft, interactive):
         # an explicit list of packages is given, don't do soft
         if soft:
             print("pkgsTest: explicit list of packages has been given, turning off soft for pkgsTest")
+            sys.stdout.flush()
             soft = False
     pkgs = list(pkgs)
     pkgs.sort()
@@ -262,8 +268,10 @@ def pkgsTest(testdb, pkgs, verbose, dryrun, soft, interactive):
             if not soft:
                 assert pkg in avail_pkgs, "testPkgs: pkg=%s is not in avail_pkgs=%s" % (pkg, '\n  '.join(avail_pkgs))
             print("pkgTest: skipping %s" % pkg)
+            sys.stdout.flush()
             continue
         print("Testing pkg=%s" % pkg)
+        sys.stdout.flush()
         results = {'PASS':[], 'FAIL':[], 'NOT-PRESENT':[]}
         pkgTestDb = testdb['pkgs'][pkg]
         commands = pkgTestDb['commands']
@@ -273,8 +281,10 @@ def pkgsTest(testdb, pkgs, verbose, dryrun, soft, interactive):
             if node == skiphost:
                 commands = []
                 print("pkg=%s skiphost=%s match - not testing" % (pkg, node))
+                sys.stdout.flush()
             else:
                 print("pkg=%s skiphost=%s not a match (node=%s) testing" % (pkg, skiphost, node))
+                sys.stdout.flush()
         for cmd in commands:
             results[externalCommandTest('pkg=%s' % pkg, cmd, True, dryrun, interactive)].append(cmd)
 
@@ -282,6 +292,7 @@ def pkgsTest(testdb, pkgs, verbose, dryrun, soft, interactive):
         for ky,val in results.items():
             summary += " %s-%d" % (ky, len(val))
         print(summary)
+        sys.stdout.flush()
         assert len(results['FAIL'])==0, "pkgsTest: %s has failures: %s" % (pkg, '  \n'.join(results['FAIL']))
 
 if __name__ == '__main__':

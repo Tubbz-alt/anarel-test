@@ -665,28 +665,32 @@ imports:
   - heapdict
   - joblib
   - joblib.*
-  - keras
-  - keras.*
-  - locket
-  - partd
+# I've commented out some of the imports, it looks like theano (which keras imports)
+# crashes my testing - if I run through paramiko in the automation of ana-rel-admin.
+# otherwise I can import everything below. I get illegal instruction from bash when
+# theano or keras is imported.
+#  - keras
+#  - keras.*
+#  - locket
+#  - partd
   - psgeom
   - seaborn
-  - seaborn.*
+#  - seaborn.*
   - tensorflow
-  - tensorflow.*
-  - theano
-  - theano.*
+#  - tensorflow.*
+#  - theano
+#  - theano.*
   - toolz
-  - toolz.*
+#  - toolz.*
   - xarray
-  - xarray.*
+#  - xarray.*
   - xray
   - cyordereddict  
-  - cyordereddict.*
+#  - cyordereddict.*
   - h5netcdf
   - enum  
   - lmfit  
-  - lmfit.*
+#  - lmfit.*
 
   todo:
   # TODO: maybe understand this failures?
