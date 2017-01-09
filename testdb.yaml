@@ -116,6 +116,7 @@ bins:
   
 imports:
   do:
+  - Bio
   - LogBookClient
   - alabaster
   - babel
