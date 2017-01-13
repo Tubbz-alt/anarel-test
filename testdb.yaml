@@ -53,8 +53,9 @@ bins:
   - sip
   - smldata
   - virtualenv
-  - vtrun
-  - vtunify
+# vampire trace deprecated in openmpi 2.0.0
+#  - vtrun
+#  - vtunify
   - wheel
   - xml2-config
   - xtcEpicsReaderTest
@@ -786,9 +787,10 @@ libs:
   - libmysqlclient_r.so
   - libopen-pal.so
   - libopen-rte.so
-  - libopen-trace-format.so
+#  - libopen-trace-format.so
   - liboshmem.so
-  - libotfaux.so
+# not in ana-1.1.0
+#  - libotfaux.so
   - libpdscalibdata.so
   - libpixman-1.so
   - libpng.so
@@ -814,11 +816,12 @@ libs:
   - libtiffxx.so
   - libtk.so
   - libtk8.5.so
-  - libvt-hyb.so
-  - libvt-mpi-unify.so
-  - libvt-mpi.so
-  - libvt-mt.so
-  - libvt.so
+# vt deprecated in openmpi 2x 
+#  - libvt-hyb.so
+#  - libvt-mpi-unify.so
+#  - libvt-mpi.so
+#  - libvt-mt.so
+#  - libvt.so
   - libxml2.so
   - libxrl.so
   - libxtcdata.so
@@ -831,7 +834,8 @@ libs:
   - libgobject-2.0.so  
   - libgthread-2.0.so  
   - libharfbuzz.so  
-  - libjasper.so  
+# not in ana-1.1.0
+#  - libjasper.so  
   - libopencv_*.so  
   - libpango*.so  
   skip:
