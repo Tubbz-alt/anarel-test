@@ -236,17 +236,13 @@ def getAvailPkgs():
     p = sb.Popen(cmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE,  universal_newlines=True)
     stdout, stderr = p.communicate()
     assert p.returncode==0, "cmd: %s returncode !=0\n===stdout:\n%s\n===stderr:\n%s" % (cmd, stdout, stderr)
-    pkgstrs = json.loads(stdout)
-    # split channel
-    def splitChannel(pkgstr):
-        if pkgstr.find('::')>=0:
-            return pkgstr.split('::')[1]
-        return pkgstr
-    pkgstrs = [splitChannel(pkgstr) for pkgstr in pkgstrs]
+    pkg_dicts = json.loads(stdout)
     pkgs = set()
-    for pkgstr in pkgstrs:
-        pkgname, pkgVer, buildStr = pkgstr.rsplit('-',2)
-        pkgs.add(pkgname)
+    for pkg_dict in pkg_dicts:
+        pkg_name = pkg_dict['name']
+        if pkg_name in pkgs:
+            sys.stderr.write("WARNING: pkg %s appears more than once in the environment\n" % pkg_name)
+        pkgs.add(pkg_dict['name'])
     return pkgs
 
 def pkgsTest(testdb, pkgs, verbose, dryrun, soft, interactive):
