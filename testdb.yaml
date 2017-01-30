@@ -1,5 +1,12 @@
 bins:
   do:
+  - curl
+  - psocake
+  - pylint
+  - conda-server
+  - bokeh
+  - cythonize
+  - pep8
   - LogBookGrabber_qt
   - spyder  
   - 2to3
@@ -86,7 +93,7 @@ bins:
   # won't run on rhel5
   - xraylib
 
-  # gives error if you are on pslogin
+  # gives error if you are on pslogin, starts a UI
   - calibman
 
 
@@ -94,8 +101,6 @@ bins:
   - crystfel2psana    
   - psana2crystfel
 
-  todo:
-  - psocake
   
 
   # this fails with: skimage/io/_plugins/qt_plugin.py", ... ImportError: cannot import name warn
