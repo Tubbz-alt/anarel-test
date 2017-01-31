@@ -3,7 +3,6 @@ bins:
   - curl
   - psocake
   - pylint
-  - conda-server
   - bokeh
   - cythonize
   - pep8
@@ -18,7 +17,6 @@ bins:
   - corana
   - coverage
   - cython
-  - ddl_psana
   - detnames
   - dmgreader
   - easy_install
@@ -60,9 +58,6 @@ bins:
   - sip
   - smldata
   - virtualenv
-# vampire trace deprecated in openmpi 2.0.0
-#  - vtrun
-#  - vtunify
   - wheel
   - xml2-config
   - xtcEpicsReaderTest
@@ -76,7 +71,6 @@ bins:
   - xtcmonserver
   - xtcmonwriter
   - xtcreader
-   # TODO: get calibman and calibrun to pass, logBook
   - calibrun
   - med
   - plims
@@ -107,7 +101,7 @@ bins:
   # we may have the wrong version of qt for this tool (whatever it is)
   - skivi
 
-  # only runs from release directory
+  # psana ddl compilers only runs from release directory (DON'T PUT ONE IN THE do SECTION)
   - ddl_*
 
   # error - unable to open perl script?
