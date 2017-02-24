@@ -675,7 +675,6 @@ imports:
 #  - toolz.*
   - xarray
 #  - xarray.*
-  - xray
   - cyordereddict  
 #  - cyordereddict.*
   - h5netcdf
