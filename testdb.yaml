@@ -878,7 +878,7 @@ pkgs:
     commands:
     - "python pkgs/mpi4py/run_tests.py"
 
-  tables:
+  pytables:
     commands:
     - "python -c \"import tables; tables.test(verbose=10)\""
 
