@@ -642,7 +642,7 @@ imports:
   - bokeh.*
   - bottleneck
   - bottleneck.*
-  - chest
+  #- chest
   - cloudpickle
   - concurrent
   - concurrent.*
@@ -653,7 +653,7 @@ imports:
   - external.protobuf
   - external.protobuf.*
   - external.six_archive
-  - heapdict
+  #- heapdict
   - joblib
   - joblib.*
 # I've commented out some of the imports, it looks like theano (which keras imports)
